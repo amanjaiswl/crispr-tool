@@ -1,0 +1,199 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Transcription Studio — DNA to mRNA</title>
+  <style>
+    :root{--bg:#111312;--surface:rgba(20,22,21,.94);--surface-2:#191b1a;--ink:#fae3ac;--muted:#b6aa90;--edge:rgba(250,227,172,.22);--accent:#01344f;--signal:#d12128;--warm:#dfa05d;--a:#d12128;--t:#dfa05d;--c:#658761;--g:#4b607f;--u:#ac5045;--good:#8ca87f;--bad:#e34c50}
+    *{box-sizing:border-box} body{margin:0;background-color:var(--bg);background-image:radial-gradient(900px 520px at 5% -8%,rgba(1,52,79,.48) 0,transparent 65%),radial-gradient(760px 480px at 102% 102%,rgba(172,80,69,.16) 0,transparent 68%),linear-gradient(rgba(250,227,172,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(250,227,172,.025) 1px,transparent 1px);background-size:auto,auto,28px 28px,28px 28px;color:var(--ink);font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif; overflow-x: hidden;}
+    button,input,textarea,select{font:inherit} button{color:var(--ink);cursor:pointer}.wrap{width:min(1240px,calc(100% - 32px));margin:auto;padding:38px 0 58px}.topbar{display:flex;justify-content:space-between;gap:24px;align-items:flex-end;margin-bottom:25px}.eyebrow{margin:0 0 8px;color:var(--warm);font-size:.69rem;letter-spacing:.19em;text-transform:uppercase;font-weight:750}.title{margin:0;letter-spacing:-.045em;font-size:clamp(1.95rem,4vw,3.28rem);line-height:1;text-transform:uppercase;font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-weight:800}.intro{margin:11px 0 0;color:var(--muted);max-width:670px;line-height:1.6}.protocol{font-size:.76rem;color:var(--muted);text-align:right;line-height:1.55}.protocol b{color:var(--good);font-weight:700}.card{border:1px solid var(--edge);border-radius:8px;background:linear-gradient(135deg,rgba(31,33,32,.97),rgba(16,18,18,.97));box-shadow:0 14px 30px rgba(0,0,0,.19),inset 0 1px 0 rgba(250,227,172,.05);backdrop-filter:blur(10px)}
+    .workspace{display:grid;grid-template-columns:370px minmax(0,1fr);gap:16px}.controls{padding:20px}.section-title{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:10px}.section-title h2{font:750 .78rem ui-monospace,SFMono-Regular,Consolas,monospace;margin:0;letter-spacing:.085em;text-transform:uppercase}.badge{font-size:.64rem;letter-spacing:.1em;text-transform:uppercase;padding:4px 7px;border:1px solid var(--edge);border-radius:2px;color:var(--muted)}.label{display:block;margin:15px 0 7px;color:var(--muted);font-size:.73rem;font-weight:650;letter-spacing:.07em;text-transform:uppercase}.field{width:100%;background:#0c1010;color:var(--ink);border:1px solid var(--edge);border-radius:4px;outline-color:var(--warm)}textarea.field{height:196px;padding:12px;resize:vertical;font:600 .89rem/1.6 ui-monospace,SFMono-Regular,Consolas,monospace;letter-spacing:.05em}select.field{padding:9px 10px;font-size:.86rem}.bar{display:flex;gap:8px;flex-wrap:wrap;margin-top:13px}.btn{border:1px solid var(--edge);background:transparent;border-radius:4px;padding:8px 10px;font-size:.76rem;font-weight:700;letter-spacing:.025em;transition:border-color .18s,background .18s,color .18s}.btn:hover,.btn:focus-visible{border-color:var(--warm);background:rgba(223,160,93,.10);outline:none}.btn.primary{background:var(--signal);color:#fae3ac;border-color:var(--signal)}.btn.primary:hover{background:#e54146}.help{min-height:34px;margin:11px 0 0;color:var(--muted);font-size:.75rem;line-height:1.45}.help.error{color:var(--bad)}
+    .lab{min-height:477px;overflow:hidden;position:relative;background-color:#080b0b;background-image:radial-gradient(620px 370px at 50% 42%,#123446 0,transparent 68%),linear-gradient(rgba(250,227,172,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(250,227,172,.035) 1px,transparent 1px);background-size:auto,26px 26px,26px 26px}.lab canvas{width:100%;height:100%;display:block;touch-action:none;cursor:grab}.lab canvas.dragging{cursor:grabbing}.hud{position:absolute;inset:0;padding:17px;pointer-events:none;display:flex;align-items:flex-start;justify-content:space-between}.hud-left,.hud-right{display:flex;gap:7px;flex-wrap:wrap;max-width:70%}.pill{background:rgba(8,11,11,.82);border:1px solid rgba(250,227,172,.22);backdrop-filter:blur(8px);border-radius:2px;padding:5px 8px;font:600 .68rem ui-monospace,SFMono-Regular,Consolas,monospace;color:#d3c7ab}.pill strong{color:#fae3ac;font-weight:700}.inspector{position:absolute;left:17px;bottom:18px;width:min(285px,calc(100% - 34px));padding:11px 12px;pointer-events:none;background:rgba(8,11,11,.82);border-color:rgba(250,227,172,.22);color:#fae3ac}.inspector h3{margin:0 0 5px;color:#b6aa90;font-size:.67rem;letter-spacing:.11em;text-transform:uppercase}.inspect-readout{font:600 .88rem/1.45 ui-monospace,SFMono-Regular,Consolas,monospace;min-height:20px}.legend{position:absolute;right:17px;bottom:18px;display:flex;gap:11px;pointer-events:none;font-size:.7rem;color:#d3c7ab;flex-wrap:wrap;justify-content:flex-end}.legend i{display:inline-block;width:8px;height:8px;border-radius:1px;margin-right:4px}.transport{position:absolute;z-index:2;right:17px;top:51px;display:flex;align-items:center;gap:7px;background:rgba(8,11,11,.82);border:1px solid rgba(250,227,172,.22);border-radius:4px;padding:6px;backdrop-filter:blur(8px)}.transport button{color:#fae3ac;border:0;background:transparent;padding:4px 6px;border-radius:2px;font-size:.74rem}.transport button:hover{background:rgba(223,160,93,.13)}.transport input{accent-color:var(--signal);width:98px}.speed{color:#d3c7ab;background:transparent;border:0;font-size:.7rem;min-width:55px;outline-color:var(--warm)}
+    .output{grid-column:1/-1;padding:19px}.output-head{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}.output-head h2{margin:0;font-size:1rem}.metrics{display:flex;gap:16px;flex-wrap:wrap;font-size:.76rem;color:var(--muted)}.metrics b{color:var(--ink);font-variant-numeric:tabular-nums}.output-actions{display:flex;gap:7px;align-items:center}.sequence{position:relative;margin-top:12px;border:1px solid var(--edge);border-radius:11px;background:#061427;min-height:122px;padding:13px;overflow:auto;font:600 .91rem/1.8 ui-monospace,SFMono-Regular,Consolas,monospace;letter-spacing:.09em;word-break:break-all;white-space:pre-wrap}.sequence .base-a{color:var(--a)}.sequence .base-u{color:var(--u)}.sequence .base-c{color:var(--c)}.sequence .base-g{color:var(--g)}.dim{color:var(--muted);font-family:inherit;font-weight:450;letter-spacing:0}.lower{display:grid;grid-template-columns:1.15fr .85fr;gap:20px;margin-top:18px;border-top:1px solid var(--edge);padding-top:15px}.lower h3{margin:0 0 8px;font-size:.73rem;color:var(--muted);text-transform:uppercase;letter-spacing:.095em}.codon-readout{font:600 .78rem/1.8 ui-monospace,SFMono-Regular,Consolas,monospace;word-break:break-word;max-height:120px;overflow:auto;color:var(--muted)}.protein{font:600 .83rem/1.7 ui-monospace,SFMono-Regular,Consolas,monospace;word-break:break-word}.protein .start{color:var(--good)}.protein .stop{color:var(--bad)}.note{font-size:.77rem;line-height:1.55;color:var(--muted)}
+    
+    /* Side Panel Styles */
+    .top-actions { display: flex; flex-direction: column; align-items: flex-end; gap: 12px; }
+    .side-panel { position: fixed; top: 0; right: -400px; width: min(400px, 100vw); height: 100vh; background: linear-gradient(135deg,rgba(31,33,32,.97),rgba(16,18,18,.97)); box-shadow: -10px 0 30px rgba(0,0,0,.5); backdrop-filter: blur(15px); border-left: 1px solid var(--edge); z-index: 100; transition: right 0.3s cubic-bezier(0.4, 0, 0.2, 1); display: flex; flex-direction: column; }
+    .side-panel.open { right: 0; }
+    .panel-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.4); backdrop-filter: blur(2px); z-index: 99; opacity: 0; pointer-events: none; transition: opacity 0.3s; }
+    .panel-overlay.open { opacity: 1; pointer-events: auto; }
+    .panel-header { padding: 20px; border-bottom: 1px solid var(--edge); display: flex; justify-content: space-between; align-items: center; }
+    .panel-header h2 { margin: 0; font-size: 1rem; color: var(--ink); font-family: ui-monospace, SFMono-Regular, Consolas, monospace; letter-spacing: .05em; text-transform: uppercase; display: flex; align-items: center; gap: 8px;}
+    .live-dot { width: 8px; height: 8px; background: var(--good); border-radius: 50%; box-shadow: 0 0 8px var(--good); animation: pulse 2s infinite;}
+    @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.4; } 100% { opacity: 1; } }
+    .panel-content { padding: 20px; overflow-y: auto; flex: 1; display: flex; flex-direction: column; gap: 12px; }
+    .history-item { background: #061427; border: 1px solid var(--edge); border-radius: 8px; padding: 14px; cursor: pointer; transition: border-color 0.2s, background 0.2s; }
+    .history-item:hover { border-color: var(--warm); background: rgba(223,160,93,.10); }
+    .history-item .seq-preview { font: 600 .85rem/1.5 ui-monospace, SFMono-Regular, Consolas, monospace; color: var(--muted); word-break: break-all; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; margin-bottom: 10px; }
+    .history-item .meta { font-size: .65rem; color: var(--warm); display: flex; justify-content: space-between; text-transform: uppercase; letter-spacing: .08em; }
+
+    @media(max-width:900px){.workspace{grid-template-columns:1fr}.lab{min-height:440px}.controls{order:0}.lab{order:1}.output{order:2}}@media(max-width:620px){.wrap{width:min(100% - 20px,1240px);padding-top:21px}.topbar{align-items:flex-start;flex-direction:column;gap:10px}.top-actions{align-items:flex-start;flex-direction:row-reverse;justify-content:space-between;width:100%}.protocol{text-align:left}.lab{min-height:380px}.transport{top:47px}.inspector{bottom:13px;left:12px}.legend{display:none}.lower{grid-template-columns:1fr}.hud{padding:12px}.hud-left{max-width:100%}.output{padding:15px}.metrics{gap:10px}.sequence{font-size:.8rem}}
+    @media(prefers-reduced-motion:reduce){.lab canvas{cursor:default}}
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <header class="topbar">
+      <div>
+        <p class="eyebrow">Interactive molecular lab</p>
+        <h1 class="title">Transcription Studio</h1>
+        <p class="intro">Map DNA to mRNA accurately, then watch a live polymerase travel through your sequence.</p>
+      </div>
+      <div class="top-actions">
+        <button id="historyBtn" class="btn" style="background: var(--surface-2); border-color: var(--edge);">Explore Live Class Feed</button>
+        <div class="protocol"><b>Global sync active</b><br>Sequences >24 bases are shared</div>
+      </div>
+    </header>
+    <section class="workspace" aria-label="DNA transcription studio">
+      <aside class="card controls"><div class="section-title"><h2>Sequence setup</h2><span class="badge">Input</span></div><label class="label" for="dna">DNA sequence</label><textarea id="dna" class="field" spellcheck="false" aria-describedby="validation">ATGCCGTAACGTTAG</textarea><label class="label" for="strand">Entered DNA strand &amp; direction</label><select id="strand" class="field"><option value="template3">Template (antisense), 3′ → 5′</option><option value="template5">Template (antisense), 5′ → 3′</option><option value="coding">Coding (sense), 5′ → 3′</option></select><div class="bar"><button class="btn primary" id="loadExample" type="button">Load example</button><button class="btn" id="clear" type="button">Clear</button><button class="btn" id="center" type="button">Center molecule</button></div><p id="validation" class="help" aria-live="polite">Whitespace is ignored. Use only A, C, G, and T.</p></aside>
+      <section class="card lab" aria-label="Animated transcription view"><canvas id="scene" role="img" aria-label="Animated DNA template and emerging mRNA molecular model"></canvas><div class="hud"><div class="hud-left"><span class="pill" id="viewPill">No sequence</span><span class="pill">drag to pan · wheel to zoom</span></div><div class="hud-right"><span class="pill" id="directionPill">mRNA 5′ → 3′</span></div></div><div class="transport"><button id="play" type="button" aria-pressed="true">❚❚ Pause</button><input id="progress" type="range" min="0" max="1000" value="0" aria-label="Polymerase position"><select id="speed" class="speed" aria-label="Animation speed"><option value="0.25" selected>0.25×</option><option value="0.5">0.5×</option><option value="1">1.0×</option></select></div><div class="card inspector"><h3>Base-pair inspector</h3><div id="inspect" class="inspect-readout">Hover a base pair</div></div><div class="legend"><span><i style="background:var(--accent)"></i>DNA template</span><span><i style="background:var(--warm)"></i>mRNA transcript</span><span><i style="background:var(--good)"></i>active site</span></div></section>
+      <section class="card output"><div class="output-head"><div><h2>mRNA transcript <span class="badge">5′ → 3′</span></h2></div><div class="metrics"><span>DNA <b id="dnaN">0</b> nt</span><span>mRNA <b id="rnaN">0</b> nt</span><span>complete codons <b id="codonN">0</b></span></div><div class="output-actions"><button class="btn" id="copy" type="button">Copy mRNA</button><button class="btn" id="fasta" type="button">FASTA</button></div></div><div id="mrna" class="sequence" aria-live="polite"><span class="dim">Your mRNA transcript appears here.</span></div><div class="lower"><div><h3>Codons · reading frame <select id="frame" aria-label="Reading frame" style="margin-left:6px;background:transparent;color:var(--ink);border:1px solid var(--edge);border-radius:6px;padding:3px"><option value="0">1</option><option value="1">2</option><option value="2">3</option></select></h3><div id="codons" class="codon-readout">—</div></div><div><h3>Protein preview</h3><div id="protein" class="protein">—</div><p id="strandNote" class="note"></p></div></div></section>
+    </section>
+    
+    <div id="panelOverlay" class="panel-overlay"></div>
+    <aside id="historyPanel" class="side-panel" aria-label="Past Queries">
+      <div class="panel-header">
+        <h2><span class="live-dot"></span> Live Class Feed</h2>
+        <button id="closePanel" class="btn" aria-label="Close panel" style="border:none; padding:4px 8px; font-size:1rem;">✕</button>
+      </div>
+      <div class="panel-content" id="historyList">
+         <div style="color: var(--muted); font-size: 0.8rem; text-align: center; margin-top: 20px;">Connecting to classroom live feed...</div>
+      </div>
+    </aside>
+  </main>
+  
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-app.js";
+    import { getDatabase, ref, push, onValue, query, limitToLast } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-database.js";
+
+    // Your exact Firebase config
+    const firebaseConfig = {
+      apiKey: "AIzaSyBO6ZwTnGDoN40ov1z0A5keqFn7Zp2eWaY",
+      authDomain: "crispr-tool.firebaseapp.com",
+      databaseURL: "https://crispr-tool-default-rtdb.firebaseio.com",
+      projectId: "crispr-tool",
+      storageBucket: "crispr-tool.firebasestorage.app",
+      messagingSenderId: "635436057346",
+      appId: "1:635436057346:web:267530315406155f76381b",
+      measurementId: "G-XJLQF263YG"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+    const historyRef = ref(db, 'class_queries');
+    const recentQueries = query(historyRef, limitToLast(25)); // Keep the last 25 sequences
+
+    // --- Base Application Code ---
+    const $=id=>document.getElementById(id), dna=$('dna'), strand=$('strand'), frame=$('frame'), canvas=$('scene'), ctx=canvas.getContext('2d');
+    const out=$('mrna'), validation=$('validation'), inspect=$('inspect'), progress=$('progress'), play=$('play');
+    const colors={A:'#d12128',T:'#dfa05d',C:'#658761',G:'#4b78a3',U:'#ac5045'}, compliment={A:'U',T:'A',C:'G',G:'C'};
+    const genetic={UUU:'Phe',UUC:'Phe',UUA:'Leu',UUG:'Leu',UCU:'Ser',UCC:'Ser',UCA:'Ser',UCG:'Ser',UAU:'Tyr',UAC:'Tyr',UAA:'Stop',UAG:'Stop',UGU:'Cys',UGC:'Cys',UGA:'Stop',UGG:'Trp',CUU:'Leu',CUC:'Leu',CUA:'Leu',CUG:'Leu',CCU:'Pro',CCC:'Pro',CCA:'Pro',CCG:'Pro',CAU:'His',CAC:'His',CAA:'Gln',CAG:'Gln',CGU:'Arg',CGC:'Arg',CGA:'Arg',CGG:'Arg',AUU:'Ile',AUC:'Ile',AUA:'Ile',AUG:'Met',ACU:'Thr',ACC:'Thr',ACA:'Thr',ACG:'Thr',AAU:'Asn',AAC:'Asn',AAA:'Lys',AAG:'Lys',AGU:'Ser',AGC:'Ser',AGA:'Arg',AGG:'Arg',GUU:'Val',GUC:'Val',GUA:'Val',GUG:'Val',GCU:'Ala',GCC:'Ala',GCA:'Ala',GCG:'Ala',GAU:'Asp',GAC:'Asp',GAA:'Glu',GAG:'Glu',GGU:'Gly',GGC:'Gly',GGA:'Gly',GGG:'Gly'};
+    let sequence='',rna='',bad='',w=0,h=0,dpr=1,cam=0,targetCam=0,zoom=1,playing=true,animationSpeed=.25,hover=-1,dragging=false,lastX=0,progressPos=0,lastTime=performance.now(),raf=0;
+    const nFmt=n=>n.toLocaleString();
+    function clean(value){return value.toUpperCase().replace(/\s/g,'')}
+    function transcribe(s,kind){if(kind==='coding')return s.replaceAll('T','U');if(kind==='template3')return [...s].map(b=>compliment[b]).join('');return [...s].reverse().map(b=>compliment[b]).join('')}
+    function escapedRNA(s){if(!s)return '<span class="dim">Your mRNA transcript appears here.</span>';const cap=26000,shown=s.length>cap?s.slice(0,13000)+'\n… '+nFmt(s.length-cap)+' bases omitted from this display (full sequence is copied/exported) …\n'+s.slice(-13000):s;return [...shown].map(b=>colors[b]?'<span class="base-'+b.toLowerCase()+'">'+b+'</span>':b).join('')}
+    function translate(){const f=Number(frame.value),groups=[],aas=[];for(let i=f;i+2<rna.length;i+=3){const codon=rna.slice(i,i+3),aa=genetic[codon];groups.push(codon);aas.push({codon,aa})}return{groups,aas}}
+    function updateText(){const t=translate();$('dnaN').textContent=nFmt(sequence.length);$('rnaN').textContent=nFmt(rna.length);$('codonN').textContent=nFmt(t.groups.length);out.innerHTML=escapedRNA(rna);$('codons').textContent=t.groups.slice(0,500).join('  ')+(t.groups.length>500?'  …':'')||'—';$('protein').innerHTML=t.aas.length?t.aas.slice(0,180).map(x=>'<span class="'+(x.aa==='Stop'?'stop':x.codon==='AUG'?'start':'')+'">'+x.aa+'</span>').join(' · ')+(t.aas.length>180?' · …':''):'—';const mode=strand.value;$('strandNote').textContent=mode==='coding'?'Coding strand: the mRNA sequence matches it except T becomes U.':mode==='template3'?'Template shown 3′ → 5′: each DNA base is paired to its complementary RNA base.':'Template shown 5′ → 3′: its reverse complement is used so mRNA is reported 5′ → 3′.'}
+    
+    // Database save logic
+    let saveTimeout;
+    let lastSavedSequence = '';
+
+    function sync(){const raw=clean(dna.value);bad=raw.replace(/[ACGT]/g,'');sequence=raw;rna=bad?'':transcribe(sequence,strand.value);if(bad){validation.textContent='Invalid base'+(bad.length===1?'':'s')+': '+[...new Set(bad)].slice(0,8).join(', ')+'. mRNA is paused until corrected.';validation.className='help error'}else{validation.textContent=sequence?'Live transcript updated. '+nFmt(sequence.length)+' base'+(sequence.length===1?'':'s')+' mapped.':'Whitespace is ignored. Use only A, C, G, and T.';validation.className='help'}updateText();if(progressPos>sequence.length)progressPos=sequence.length;progress.value=sequence.length?Math.round(progressPos/sequence.length*1000):0; $('viewPill').textContent=sequence?'Windowed view · '+nFmt(sequence.length)+' bases':'No sequence';
+      
+      clearTimeout(saveTimeout);
+      // Wait 3 seconds after the user stops typing to save
+      saveTimeout = setTimeout(saveToFirebase, 3000); 
+    }
+
+    function saveToFirebase() {
+      // Rule: must be >24 bases, no invalid chars, and not just repeatedly saving the same thing
+      if (!bad && sequence.length > 24 && sequence !== lastSavedSequence) {
+        lastSavedSequence = sequence;
+        push(historyRef, {
+          seq: sequence,
+          strand: strand.value,
+          timestamp: Date.now()
+        }).catch(err => console.error("Firebase save failed:", err));
+      }
+    }
+
+    function resize(){const r=canvas.getBoundingClientRect();dpr=Math.min(devicePixelRatio||1,2);w=r.width;h=r.height;canvas.width=Math.max(1,Math.round(w*dpr));canvas.height=Math.max(1,Math.round(h*dpr));ctx.setTransform(dpr,0,0,dpr,0,0)}
+    function worldX(i){return w*.5+(i-progressPos)*52*zoom+cam} function visibleRange(){const span=Math.ceil(w/(52*zoom)/2)+3,mid=Math.round(progressPos-cam/(52*zoom));return[Math.max(0,mid-span),Math.min(sequence.length-1,mid+span)]}
+    function baseAt(i){if(strand.value==='template5')return sequence[sequence.length-1-i]||'';return sequence[i]||''}function rnaAt(i){return rna[i]||''}
+    function roundedRect(x,y,width,height,r){ctx.beginPath();ctx.roundRect(x,y,width,height,r);ctx.fill()} function drawNode(x,y,b,r,alpha=1){ctx.globalAlpha=alpha;ctx.fillStyle=colors[b]||'#fff';ctx.shadowBlur=15;ctx.shadowColor=colors[b]||'#fff';ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);ctx.fill();ctx.shadowBlur=0;ctx.fillStyle='#07101d';ctx.font='700 '+Math.max(10,r*.9)+'px ui-monospace,monospace';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(b,x,y+1);ctx.globalAlpha=1}
+    function draw(time){const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches,dt=Math.min(40,time-lastTime);lastTime=time;if(playing&&!reduced&&sequence.length){progressPos=(progressPos+dt*.006*animationSpeed)%Math.max(sequence.length,1);progress.value=Math.round(progressPos/sequence.length*1000)}cam+=(targetCam-cam)*.13;ctx.clearRect(0,0,w,h);const templateY=h*.38, rnaY=h*.70, [from,to]=visibleRange();
+      const drift= reduced?0:time*.0012; 
+      ctx.strokeStyle='rgba(250,227,172,.13)';ctx.lineWidth=1;[templateY,rnaY].forEach(y=>{ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(w,y);ctx.stroke()});
+      if(!sequence||bad){ctx.fillStyle='rgba(157,183,214,.74)';ctx.font='500 14px system-ui';ctx.textAlign='center';ctx.fillText(bad?'Correct the sequence to resume the molecule.':'Enter DNA to assemble the molecule.',w/2,h*.52);raf=requestAnimationFrame(draw);return}
+      const active=Math.floor(progressPos)%sequence.length, activeX=worldX(active); 
+      const glow=ctx.createRadialGradient(activeX,templateY,2,activeX,templateY,74);glow.addColorStop(0,'rgba(223,160,93,.25)');glow.addColorStop(1,'rgba(223,160,93,0)');ctx.fillStyle=glow;ctx.beginPath();ctx.arc(activeX,templateY,74,0,Math.PI*2);ctx.fill();
+      
+      let prev=null;for(let i=from;i<=to;i++){const x=worldX(i),phase=drift+i*.48, yD=templateY+Math.sin(phase)*12, emerging=i<=progressPos||(!playing&&i<=Math.floor(progressPos));const yR=rnaY+Math.sin(phase+1.7)*10+(emerging?0:26);if(prev){ctx.strokeStyle='rgba(70,128,157,.62)';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(prev.x,prev.yD);ctx.lineTo(x,yD);ctx.stroke();if(emerging){ctx.strokeStyle='rgba(223,160,93,.62)';ctx.beginPath();ctx.moveTo(prev.x,prev.yR);ctx.lineTo(x,yR);ctx.stroke()}}const base=baseAt(i),rBase=rnaAt(i);ctx.strokeStyle=i===active?'rgba(223,160,93,.97)':'rgba(250,227,172,.23)';ctx.lineWidth=i===active?2:1;ctx.beginPath();ctx.moveTo(x,yD);ctx.lineTo(x,yR);ctx.stroke();drawNode(x,yD,base, i===active?18:14);if(emerging)drawNode(x,yR,rBase, i===active?17:13);else{ctx.globalAlpha=.23;drawNode(x,yR,rBase,11,.23);ctx.globalAlpha=1}if(i===hover){ctx.strokeStyle='rgba(250,227,172,.9)';ctx.lineWidth=1.5;ctx.beginPath();ctx.arc(x,yD,25,0,Math.PI*2);ctx.stroke()}prev={x,yD,yR}}
+      
+      ctx.fillStyle='rgba(9,13,13,.95)';ctx.strokeStyle='#dfa05d';ctx.lineWidth=1.4;roundedRect(activeX-38,templateY-30,76,38,6);ctx.stroke();ctx.fillStyle='#fae3ac';ctx.font='700 10px ui-monospace,monospace';ctx.textAlign='center';ctx.fillText('POLYMERASE',activeX,templateY-10);ctx.fillStyle='rgba(250,227,172,.61)';ctx.font='500 10px ui-monospace,monospace';ctx.fillText('base '+(active+1),activeX,templateY+4);
+      raf=requestAnimationFrame(draw)
+    }
+    function findHover(clientX,clientY){if(!sequence){hover=-1;inspect.textContent='Hover a base pair';return}const r=canvas.getBoundingClientRect(),x=clientX-r.left,y=clientY-r.top,i=Math.round(progressPos+(x-w*.5-cam)/(52*zoom));const yD=h*.38;if(i>=0&&i<sequence.length&&Math.abs(y-yD)<58){hover=i;const d=baseAt(i),m=rnaAt(i);inspect.innerHTML='index '+(i+1)+' &nbsp; DNA <span style="color:'+colors[d]+'">'+d+'</span> → mRNA <span style="color:'+colors[m]+'">'+m+'</span>'}else{hover=-1;inspect.textContent='Hover a base pair'}}
+    function exportFasta(){if(!rna)return;const blob=new Blob(['>mRNA transcript | '+strand.options[strand.selectedIndex].text+'\n'+rna.match(/.{1,70}/g).join('\n')+'\n'],{type:'text/plain'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='mrna-transcript.fasta';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),100)}
+    dna.addEventListener('input',sync);strand.addEventListener('change',sync);frame.addEventListener('change',updateText);$('loadExample').onclick=()=>{dna.value='TACCGGCATTGCAAT';strand.value='template3';progressPos=0;sync()};$('clear').onclick=()=>{dna.value='';progressPos=0;sync();dna.focus()};$('center').onclick=()=>{targetCam=0;progressPos=sequence.length/2};$('copy').onclick=async()=>{if(!rna)return;try{await navigator.clipboard.writeText(rna);validation.textContent='mRNA copied to your clipboard.';validation.className='help'}catch{validation.textContent='Select the transcript and copy it manually in this browser.';validation.className='help error'}};$('fasta').onclick=exportFasta;
+    play.onclick=()=>{playing=!playing;play.textContent=playing?'❚❚ Pause':'▶ Play';play.setAttribute('aria-pressed',String(playing))};$('speed').addEventListener('change',e=>{animationSpeed=Number(e.target.value)});progress.addEventListener('input',()=>{if(sequence.length)progressPos=Number(progress.value)/1000*sequence.length});
+    canvas.addEventListener('pointerdown',e=>{dragging=true;lastX=e.clientX;canvas.classList.add('dragging');canvas.setPointerCapture(e.pointerId)});canvas.addEventListener('pointerup',e=>{dragging=false;canvas.classList.remove('dragging');canvas.releasePointerCapture(e.pointerId)});canvas.addEventListener('pointermove',e=>{if(dragging){targetCam+=e.clientX-lastX;lastX=e.clientX}else findHover(e.clientX,e.clientY)});canvas.addEventListener('pointerleave',()=>{if(!dragging){hover=-1;inspect.textContent='Hover a base pair'}});canvas.addEventListener('wheel',e=>{e.preventDefault();const prior=zoom;zoom=Math.max(.35,Math.min(2.7,zoom*(e.deltaY>0?.88:1.13)));targetCam+=(w*.5-e.offsetX)*(1-zoom/prior)}, {passive:false});
+    
+    // --- Live History UI Logic ---
+    const historyBtn=$('historyBtn'), historyPanel=$('historyPanel'), closePanel=$('closePanel'), panelOverlay=$('panelOverlay'), historyList=$('historyList');
+    
+    function togglePanel(open) {
+      historyPanel.classList.toggle('open', open);
+      panelOverlay.classList.toggle('open', open);
+    }
+    historyBtn.onclick = () => togglePanel(true);
+    closePanel.onclick = () => togglePanel(false);
+    panelOverlay.onclick = () => togglePanel(false);
+
+    // Listen to Firebase for live updates
+    onValue(recentQueries, (snapshot) => {
+      const data = snapshot.val();
+      historyList.innerHTML = '';
+      
+      if (!data) {
+        historyList.innerHTML = '<div style="color: var(--muted); font-size: 0.8rem; text-align: center; margin-top: 20px;">No sequences shared yet. Be the first!</div>';
+        return;
+      }
+
+      // Convert Firebase object to array and sort newest to oldest
+      const queries = Object.values(data).sort((a, b) => b.timestamp - a.timestamp);
+
+      queries.forEach((q) => {
+        const div = document.createElement('div');
+        div.className = 'history-item';
+        
+        // Format time like "2 mins ago" or "Just now"
+        const diffSecs = Math.floor((Date.now() - q.timestamp) / 1000);
+        let timeStr = 'Just now';
+        if (diffSecs > 60) timeStr = Math.floor(diffSecs/60) + 'm ago';
+        if (diffSecs > 3600) timeStr = Math.floor(diffSecs/3600) + 'h ago';
+
+        div.innerHTML = `<div class="seq-preview">${q.seq}</div><div class="meta"><span>${q.strand.replace('template', 'Temp ')}</span><span>${timeStr} · ${nFmt(q.seq.length)} bases</span></div>`;
+        
+        // Clicking a past query loads it instantly
+        div.onclick = () => {
+          $('dna').value = q.seq;
+          $('strand').value = q.strand || 'coding';
+          progressPos = 0;
+          sync();
+          togglePanel(false);
+        };
+        historyList.appendChild(div);
+      });
+    }, (error) => {
+      historyList.innerHTML = `<div style="color: var(--bad); font-size: 0.8rem; text-align: center; margin-top: 20px;">Database connection issue or missing permissions. Did you set up the rules?</div>`;
+      console.error(error);
+    });
+
+    new ResizeObserver(resize).observe(canvas);resize();sync();raf=requestAnimationFrame(draw);
+  </script>
+</body>
+</html>
