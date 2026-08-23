@@ -29,6 +29,17 @@
     .history-item .seq-preview { font: 600 .85rem/1.5 ui-monospace, SFMono-Regular, Consolas, monospace; color: var(--muted); word-break: break-all; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; margin-bottom: 10px; }
     .history-item .meta { font-size: .65rem; color: var(--warm); display: flex; justify-content: space-between; text-transform: uppercase; letter-spacing: .08em; }
 
+    /* Modal Explainer Styles */
+    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.7); backdrop-filter: blur(5px); z-index: 200; display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1); padding: 20px; }
+    .modal-overlay.open { opacity: 1; pointer-events: auto; }
+    .modal-content { width: min(750px, 100%); max-height: 90vh; background: linear-gradient(135deg,rgba(31,33,32,.97),rgba(16,18,18,.97)); border: 1px solid var(--edge); border-radius: 12px; box-shadow: 0 20px 40px rgba(0,0,0,.4); display: flex; flex-direction: column; transform: translateY(20px); transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+    .modal-overlay.open .modal-content { transform: translateY(0); }
+    .modal-body { padding: 0 25px 25px; overflow-y: auto; color: var(--muted); font-size: .88rem; line-height: 1.6; }
+    .modal-body h4 { color: var(--ink); margin: 24px 0 6px; font-size: .88rem; text-transform: uppercase; letter-spacing: .08em; font-family: ui-monospace, SFMono-Regular, Consolas, monospace; }
+    .modal-body p { margin: 0 0 12px; }
+    .modal-body b { color: var(--warm); }
+    .explainer-footer { display: flex; justify-content: flex-end; margin-top: 15px; }
+
     @media(max-width:900px){.workspace{grid-template-columns:1fr}.lab{min-height:440px}.controls{order:0}.lab{order:1}.output{order:2}}@media(max-width:620px){.wrap{width:min(100% - 20px,1240px);padding-top:21px}.topbar{align-items:flex-start;flex-direction:column;gap:10px}.top-actions{align-items:flex-start;flex-direction:row-reverse;justify-content:space-between;width:100%}.protocol{text-align:left}.lab{min-height:380px}.transport{top:47px}.inspector{bottom:13px;left:12px}.legend{display:none}.lower{grid-template-columns:1fr}.hud{padding:12px}.hud-left{max-width:100%}.output{padding:15px}.metrics{gap:10px}.sequence{font-size:.8rem}}
     @media(prefers-reduced-motion:reduce){.lab canvas{cursor:default}}
   </style>
@@ -37,7 +48,6 @@
   <main class="wrap">
     <header class="topbar">
       <div>
-        
         <h1 class="title">Transcription </h1>
         <p class="intro">Map DNA to mRNA accurately, then watch a live polymerase travel through your sequence.</p>
       </div>
@@ -52,6 +62,12 @@
       <section class="card output"><div class="output-head"><div><h2>mRNA transcript <span class="badge">5′ → 3′</span></h2></div><div class="metrics"><span>DNA <b id="dnaN">0</b> nt</span><span>mRNA <b id="rnaN">0</b> nt</span><span>complete codons <b id="codonN">0</b></span></div><div class="output-actions"><button class="btn" id="copy" type="button">Copy mRNA</button><button class="btn" id="fasta" type="button">FASTA</button></div></div><div id="mrna" class="sequence" aria-live="polite"><span class="dim">Your mRNA transcript appears here.</span></div><div class="lower"><div><h3>Codons · reading frame <select id="frame" aria-label="Reading frame" style="margin-left:6px;background:transparent;color:var(--ink);border:1px solid var(--edge);border-radius:6px;padding:3px"><option value="0">1</option><option value="1">2</option><option value="2">3</option></select></h3><div id="codons" class="codon-readout">—</div></div><div><h3>Protein preview</h3><div id="protein" class="protein">—</div><p id="strandNote" class="note"></p></div></div></section>
     </section>
     
+    <div class="explainer-footer">
+      <button id="openExplainerBtn" class="btn" style="border-color: transparent; color: var(--muted); display: flex; align-items: center; gap: 6px;">
+        <span style="font-size: 1.1em;">📘</span> Terminology Explainer
+      </button>
+    </div>
+
     <div id="panelOverlay" class="panel-overlay"></div>
     <aside id="historyPanel" class="side-panel" aria-label="Past Queries">
       <div class="panel-header">
@@ -62,6 +78,46 @@
          <div style="color: var(--muted); font-size: 0.8rem; text-align: center; margin-top: 20px;">Connecting to classroom live feed...</div>
       </div>
     </aside>
+
+    <div id="explainerModal" class="modal-overlay" aria-hidden="true">
+      <div class="modal-content">
+        <div class="panel-header" style="border-bottom: 0;">
+          <h2>Terminology Guide</h2>
+          <button id="closeExplainer" class="btn" aria-label="Close guide" style="border:none; padding:4px 8px; font-size:1rem;">✕</button>
+        </div>
+        <div class="modal-body">
+          <h4>DNA (Deoxyribonucleic Acid)</h4>
+          <p>The double-stranded molecule that carries the genetic instructions for life. It consists of four bases: Adenine (<b>A</b>), Thymine (<b>T</b>), Cytosine (<b>C</b>), and Guanine (<b>G</b>).</p>
+          
+          <h4>mRNA (Messenger RNA)</h4>
+          <p>A single-stranded RNA molecule that is transcribed from DNA. It acts as a messenger, carrying the genetic blueprint from the nucleus to the ribosomes, where proteins are built. In mRNA, Thymine (T) is replaced by Uracil (<b>U</b>).</p>
+          
+          <h4>Transcription</h4>
+          <p>The process where an enzyme called RNA Polymerase reads a segment of DNA and synthesizes a complementary mRNA sequence.</p>
+          
+          <h4>Translation</h4>
+          <p>The biological process where cellular machines (ribosomes) read the mRNA sequence to assemble a specific chain of amino acids, ultimately folding into a functional protein.</p>
+          
+          <h4>Codon</h4>
+          <p>A sequence of three consecutive mRNA bases (e.g., AUG, CCG). Each codon acts like a "word" that translates into one specific amino acid, or serves as a "stop" signal to end translation.</p>
+          
+          <h4>Reading Frame (1, 2, or 3)</h4>
+          <p>Because codons are read in groups of three, the starting position completely changes the output. Shifting the starting base by one or two positions (Frame 2 or 3) shifts the "reading frame," resulting in a completely different chain of amino acids.</p>
+          
+          <h4>5′ → 3′ & 3′ → 5′ Directionality</h4>
+          <p>Pronounced "five prime to three prime." DNA and RNA strands have a strict chemical direction based on their carbon structure. Enzymes like RNA polymerase can <i>only</i> build new strands in the 5′ → 3′ direction.</p>
+          
+          <h4>Template Strand (Antisense)</h4>
+          <p>The physical DNA strand that the polymerase enzyme binds to and reads. It runs 3′ → 5′, allowing the mRNA to be built as a direct complement in the 5′ → 3′ direction.</p>
+          
+          <h4>Coding Strand (Sense)</h4>
+          <p>The DNA strand opposite the template. It is called the "coding" strand because its sequence exactly matches the final mRNA transcript (except that it has T instead of U).</p>
+          
+          <h4>FASTA Format</h4>
+          <p>A universal, text-based format used by scientists and bioinformatics software to represent nucleotide (DNA/RNA) or peptide (protein) sequences. It always begins with a standard header line starting with a `>` symbol.</p>
+        </div>
+      </div>
+    </div>
   </main>
   
   <script type="module">
@@ -152,7 +208,23 @@
     }
     historyBtn.onclick = () => togglePanel(true);
     closePanel.onclick = () => togglePanel(false);
-    panelOverlay.onclick = () => togglePanel(false);
+    panelOverlay.onclick = () => { togglePanel(false); toggleExplainer(false); };
+
+    // --- Explainer Modal Logic ---
+    const openExplainerBtn = $('openExplainerBtn'), explainerModal = $('explainerModal'), closeExplainer = $('closeExplainer');
+    
+    function toggleExplainer(open) {
+      explainerModal.classList.toggle('open', open);
+      if(open) { explainerModal.setAttribute('aria-hidden', 'false'); } 
+      else { explainerModal.setAttribute('aria-hidden', 'true'); }
+    }
+    openExplainerBtn.onclick = () => toggleExplainer(true);
+    closeExplainer.onclick = () => toggleExplainer(false);
+    
+    // Close modal if clicking exactly on the dark overlay (outside the card)
+    explainerModal.onclick = (e) => {
+      if(e.target === explainerModal) toggleExplainer(false);
+    };
 
     // Listen to Firebase for live updates
     onValue(recentQueries, (snapshot) => {
