@@ -38,9 +38,20 @@
     .modal-body h4 { color: var(--ink); margin: 24px 0 6px; font-size: .88rem; text-transform: uppercase; letter-spacing: .08em; font-family: ui-monospace, SFMono-Regular, Consolas, monospace; }
     .modal-body p { margin: 0 0 12px; }
     .modal-body b { color: var(--warm); }
-    .explainer-footer { display: flex; justify-content: flex-end; margin-top: 15px; }
-
-    @media(max-width:900px){.workspace{grid-template-columns:1fr}.lab{min-height:440px}.controls{order:0}.lab{order:1}.output{order:2}}@media(max-width:620px){.wrap{width:min(100% - 20px,1240px);padding-top:21px}.topbar{align-items:flex-start;flex-direction:column;gap:10px}.top-actions{align-items:flex-start;flex-direction:row-reverse;justify-content:space-between;width:100%}.protocol{text-align:left}.lab{min-height:380px}.transport{top:47px}.inspector{bottom:13px;left:12px}.legend{display:none}.lower{grid-template-columns:1fr}.hud{padding:12px}.hud-left{max-width:100%}.output{padding:15px}.metrics{gap:10px}.sequence{font-size:.8rem}}
+    
+    /* Footer Credit Styles */
+    .site-footer { display: flex; align-items: center; justify-content: space-between; margin-top: 30px; flex-wrap: wrap; gap: 15px; }
+    .site-footer .spacer { flex: 1; }
+    .site-footer .credit { flex: 1; text-align: center; font-size: .75rem; color: var(--muted); font-family: ui-monospace, SFMono-Regular, Consolas, monospace; opacity: 0.6; letter-spacing: .05em; }
+    .site-footer .explainer-wrap { flex: 1; display: flex; justify-content: flex-end; }
+    
+    @media(max-width:900px){.workspace{grid-template-columns:1fr}.lab{min-height:440px}.controls{order:0}.lab{order:1}.output{order:2}}
+    @media(max-width:620px){
+      .wrap{width:min(100% - 20px,1240px);padding-top:21px}.topbar{align-items:flex-start;flex-direction:column;gap:10px}.top-actions{align-items:flex-start;flex-direction:row-reverse;justify-content:space-between;width:100%}.protocol{text-align:left}.lab{min-height:380px}.transport{top:47px}.inspector{bottom:13px;left:12px}.legend{display:none}.lower{grid-template-columns:1fr}.hud{padding:12px}.hud-left{max-width:100%}.output{padding:15px}.metrics{gap:10px}.sequence{font-size:.8rem}
+      .site-footer { flex-direction: column-reverse; justify-content: center; margin-top: 20px; }
+      .site-footer .spacer { display: none; }
+      .site-footer .explainer-wrap { justify-content: center; }
+    }
     @media(prefers-reduced-motion:reduce){.lab canvas{cursor:default}}
   </style>
 </head>
@@ -48,7 +59,7 @@
   <main class="wrap">
     <header class="topbar">
       <div>
-        <h1 class="title">Transcription </h1>
+        <h1 class="title">Transcription</h1>
         <p class="intro">Map DNA to mRNA accurately, then watch a live polymerase travel through your sequence.</p>
       </div>
       <div class="top-actions">
@@ -62,12 +73,18 @@
       <section class="card output"><div class="output-head"><div><h2>mRNA transcript <span class="badge">5′ → 3′</span></h2></div><div class="metrics"><span>DNA <b id="dnaN">0</b> nt</span><span>mRNA <b id="rnaN">0</b> nt</span><span>complete codons <b id="codonN">0</b></span></div><div class="output-actions"><button class="btn" id="copy" type="button">Copy mRNA</button><button class="btn" id="fasta" type="button">FASTA</button></div></div><div id="mrna" class="sequence" aria-live="polite"><span class="dim">Your mRNA transcript appears here.</span></div><div class="lower"><div><h3>Codons · reading frame <select id="frame" aria-label="Reading frame" style="margin-left:6px;background:transparent;color:var(--ink);border:1px solid var(--edge);border-radius:6px;padding:3px"><option value="0">1</option><option value="1">2</option><option value="2">3</option></select></h3><div id="codons" class="codon-readout">—</div></div><div><h3>Protein preview</h3><div id="protein" class="protein">—</div><p id="strandNote" class="note"></p></div></div></section>
     </section>
     
-    <div class="explainer-footer">
-      <button id="openExplainerBtn" class="btn" style="border-color: transparent; color: var(--muted); display: flex; align-items: center; gap: 6px;">
-        <span style="font-size: 1.1em;">📘</span> Terminology Explainer
-      </button>
-    </div>
+    <!-- Footer Section with Credit and Explainer Button -->
+    <footer class="site-footer">
+      <div class="spacer"></div>
+      <div class="credit">made with 🧬 by aman</div>
+      <div class="explainer-wrap">
+        <button id="openExplainerBtn" class="btn" style="border-color: transparent; color: var(--muted); display: flex; align-items: center; gap: 6px;">
+          <span style="font-size: 1.1em;">📘</span> Terminology Explainer
+        </button>
+      </div>
+    </footer>
 
+    <!-- Side Panel -->
     <div id="panelOverlay" class="panel-overlay"></div>
     <aside id="historyPanel" class="side-panel" aria-label="Past Queries">
       <div class="panel-header">
@@ -79,6 +96,7 @@
       </div>
     </aside>
 
+    <!-- Modal Explainer Overlay -->
     <div id="explainerModal" class="modal-overlay" aria-hidden="true">
       <div class="modal-content">
         <div class="panel-header" style="border-bottom: 0;">
